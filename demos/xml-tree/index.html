@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>xml-tree</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="../../src/micro.js"></script>
+		<script src="../../src/e4x.js"></script>
+		<script src="xml-tree.js"></script>
+	</head>
+	<body>
+	    
+ 	    <xml-tree>
+			<system:Solar id="system" xmlns:star="aze">
+		        <star:Field id="system.stars"></star:Field>
+		        <star:Sun id="system.sun"></star:Sun>
+		        <planet:Earth id="system.earth" atmosphere="true" clouds="0.5">
+		            <THREE:PerspectiveCamera id="system.earth.camera"></THREE:PerspectiveCamera>
+		        </planet:Earth>
+		        <planet:Moon></planet:Moon>
+		    </system:Solar>
+	    </xml-tree>
+	    <br/>
+	    <xml-tree id="tree">
+			<style>
+			.mx s, .mx prefix, .mx localName{color: #0b93bb;background: #f59b5b;text-shadow: 0 1px 0px rgba(0,0,0,.5);}
+			.mx s {color: transparent;}
+			.mx s:first-child { border-radius: 10px 0px 0px 10px }
+			.mx s:last-child { border-radius: 0px 10px 10px 0px }
+			</style>
+	    </xml-tree>
+		
+		<text-mute id="editor">
+		</text-mute>
+
+		<script>
+
+"use strict";
+
+var NS = {
+    html: 'xmlns="http://www.w3.org/1999/xhtml"',
+    t3: 'xmlns:THREE="THREE.*"',
+	fb: 'xmlns:fb="http://www.facebook.com/"',
+    lang: 'xmlns:lang="languages"',
+    mx: 'xmlns:mx="mx.*"',
+    icon: 'xmlns:icon="/images/icons/*"',
+
+};
+
+var page = x`<div ${NS.html} class="container">
+    <div class="row">
+        <div class="col-xl-12"></div>
+    </div>
+</div>`;
+
+var personne = x`<personne ${NS.fb} ${NS.lang}>
+  <nom>Jean Dupont</nom>
+  <fb:aime>
+    <os>Linux</os>
+    <navigateur lang:fr_FR="Navigateur">Firefox</navigateur>
+    <langage>JavaScript</langage>
+    <langage>Python</langage>
+  </fb:aime>
+</personne>`;
+
+var languages = x`<languages type="dynamique">
+   <lang>JavaScript</lang>
+   <lang>Python</lang>
+ </languages>`;
+
+
+var gens = x`<gens xmlns:h="http://www.w3.org/1999/xhtml">
+  <personne h:contenteditable="true">
+    <string:nom>Pierre</string:nom>
+    <age>32</age>
+  </personne>
+  <personne>
+    <nom>Paul</nom>
+    <age>46</age>
+  </personne>
+</gens>`;
+
+var app = x`<mx:Application ${NS.mx} ${NS.icon}>
+  <mx:Header>
+    <mx:Button><icon:menu/></mx:Button>
+  </mx:Header>
+  <mx:PageView selected="{config.startPage}">
+    <mx:Page>Paul</mx:Page>
+    <mx:Page>46</mx:Page>
+  </mx:PageView>
+</mx:Application>`;
+
+
+// console.log(languages.$type); // Affiche "dynamique"
+// languages.$type = "agile";
+// console.log(languages.$type); // Affiche "agile"
+console.log(languages.toString());
+/* Affiche :
+<languages type="agile"><lang>JavaScript</lang><lang>Python</lang></languages>
+*/
+
+
+console.log( personne.nom ); // "Jean Dupont"
+console.log( personne['nom'] ); // "Jean Dupont"
+console.log( personne.aime.navigateur ); // "Firefox"
+console.log( personne['aime'].navigateur ); // "Firefox"
+console.log( personne.aime.langage.length() ); // 2
+// console.log( personne.aime.$.length()); // 4
+// console.log( personne._.$.length()); // 11
+console.log( personne.nom.text() ); // "Jean Dupont"
+var xml = personne.toXMLString(); // Une chaîne contenant le XML
+// var copiePersonne = personne.copy(); // Une copie profonde de l'objet XML
+// var enfant = person.child(1); // Le second nœud enfant ; dans ce cas l'élément <aime>
+
+
+var $tree = '#tree'.$
+  ;
+
+$tree.appendChild(
+    personne._children[0]
+);
+$tree.appendChild(
+    gens._children[0]
+);
+$tree.appendChild(
+    languages._children[0]
+);
+$tree.appendChild(
+    page._children[0]
+);
+$tree.appendChild(
+    app._children[0]
+);
+
+
+
+		</script>
+	</body>
+</html>

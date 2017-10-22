@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Tests - json-dom-proxy</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.7.2/less.min.js"></script>
+		<script src="json-dom-proxy.js"></script>
+		
+		<style less toto="rebeccapurple">
+			@import "http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css";
+			@namespace j "";
+			xstyle {display: none; }
+			body {
+				white-space: pre;
+				font-family: monospace;
+				--jdp-key-color: rebeccapurple;
+			}
+			
+			* { transition: all 1s ease; }
+			
+			header {
+				position: fixed;
+				top: 0;
+				display: flex;
+				width: 100%;
+				background: rebeccapurple;
+				padding: 3px;
+				left: 0;
+			}
+			
+			Object { display: block }
+			Array { display: block }
+			
+			j|Boolean::after { content: attr(value) }
+			j|Number::after { content: attr(value) }
+			j|String::after { content: attr(value) }
+			
+			.Prettyprint j|* { display: block; }
+			.Prettyprint j|Object > * { margin-left: 2rem; }
+			
+			.JS {
+				Object::before { content: "{" }
+				Object::after { content: "}" }
+				/*Object > *::after { content: ',' }*/
+				Array::before { content: "[" }
+				Array::after { content: "]" }
+				/*Array > *::after { content: ',' }*/
+				j|Boolean[name]::before { content: attr(name)" :" }
+				j|Number[name]::before { content: attr(name)" :" }
+				j|String::after { content: '"'attr(value)'"' }
+				j|String[name]::before { content: attr(name)" :" }
+				j|Object[name]::before { content: attr(name)" : {" }
+				j|Array[name]::before { content: attr(name)" : [" }
+			}
+			
+			.JSON {
+				j|*[name]::before {
+					content: '"'attr(name)'" :' !important;
+					color: var(--jdp-key-color);
+				}
+			}
+			
+			.Colors {
+				j|Boolean { color: blue !important }
+				j|Number { color: blue !important }
+				j|String { color: green !important }
+			}
+			
+			.List {
+				background: lightgrey;
+				
+				Array[name=users] {
+					display: flex;
+					flex-direction: column;
+				
+					&::before { content:''; }
+					
+					& > Object[type=Person] {
+						background: white;
+						box-shadow: 0 4px 10px grey;
+						border-radius: 5px;
+						margin: 1rem;
+						padding: 0.5rem;
+						
+						&::before {
+							content: "\f213"; font-family: "Ionicons";
+							font-size: 3rem;
+							color: rgba(0,0,0,0.05);
+							position: absolute;
+							/* right: 50px; */
+						}
+						
+						& > [name="@context"],
+						& > [name="@type"],
+						& > [name=id] {
+							display: none;
+						}
+						
+						& > [name=name],
+						& > [name=username] {
+							margin-left: 3.4rem;
+						}
+						& > [name=name] {
+							display: block;
+							font-size: 1.3rem;
+						}
+						& > [name=username] {
+							color: blue;
+							text-decoration: underline;
+							cursor: pointer;
+						}
+						& > [name=email] {
+							color: grey;
+							
+							&::before {
+								display: inline-block;
+								content: "\f422";
+								font-family: "Ionicons";
+								speak: none;
+								font-style: normal;
+								font-weight: normal;
+								font-variant: normal;
+								text-transform: none;
+								text-rendering: auto;
+								line-height: 1;
+								-webkit-font-smoothing: antialiased;
+								-moz-osx-font-smoothing: grayscale;
+							}
+							&::after { content: "( "attr(value)" )"; }
+						}
+						
+						& > [name=address] {
+							color: grey;
+							
+							& > [name=street] { color: grey; }
+							& > [name=suite] { color: grey; }
+							& > [name=city] { color: grey; }
+							& > [name=zipcode] { color: grey; }
+						}
+						
+						& > [name=phone] { color: grey; }
+						& > [name=website] { color: grey; }
+			
+					}
+				}
+			}
+		</style>
+		<xstyle>
+			@import "http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css";
+			@namespace j "";
+			
+			body {
+				white-space: pre;
+				font-family: monospace;
+				--jdp-key-color: rebeccapurple;
+			}
+			* { transition: all 1s ease; }
+			header {
+				position: fixed;
+				top: 0;
+				display: flex;
+				width: 100%;
+				background: rebeccapurple;
+				padding: 3px;
+				left: 0;
+			}
+
+			Object { display: block }
+				.JS Object::before { content: "{" }
+				.JS Object::after { content: "}" }
+				/*.JS Object > *::after { content: ',' }*/
+			Array { display: block }
+				.JS Array::before { content: "[" }
+				.JS Array::after { content: "]" }
+				/*.JS Array > *::after { content: ',' }*/
+			
+			j|Boolean::after { content: attr(value) }
+			j|Number::after { content: attr(value) }
+			j|String::after { content: attr(value) }
+			
+			.Prettyprint j|* { display: block; }
+			.Prettyprint j|Object > * { margin-left: 2rem; }
+			
+			.JS j|Boolean[name]::before { content: attr(name)" :" }
+			.JS j|Number[name]::before { content: attr(name)" :" }
+			.JS j|String::after { content: '"'attr(value)'"' }
+			.JS j|String[name]::before { content: attr(name)" :" }
+			.JS j|Object[name]::before { content: attr(name)" : {" }
+			.JS j|Array[name]::before { content: attr(name)" : [" }
+			
+			.JSON j|*[name]::before
+			{ content: '"'attr(name)'" :' !important; color: var(--jdp-key-color); }
+			
+			.Colors j|Boolean { color: blue !important }
+			.Colors j|Number { color: blue !important }
+			.Colors j|String { color: green !important }
+			
+			.List { background: lightgrey }
+			.List Array { display: flex; flex-direction: column; }
+			.List Array::before {content:'';}
+			.List Array > Object[type=Person] { 
+				background: white;
+				box-shadow: 0 4px 10px grey;
+				border-radius: 5px;
+				margin: 1rem;
+				padding: 0.5rem;
+				
+			}
+			.List Array > Object[type=Person]::before {
+				content: "\f213"; font-family: "Ionicons";
+				font-size: 3rem;
+				color: rgba(0,0,0,0.05);
+				position: absolute;
+				/* right: 50px; */
+			}
+}
+			.List Array > Object[type=Person] > [name="@context"],
+			.List Array > Object[type=Person] > [name="@type"],
+			.List Array > Object[type=Person] > [name=id] { display: none; }
+			
+			.List Array > Object[type=Person] > [name=name],
+			.List Array > Object[type=Person] > [name=username]
+			{ margin-left: 3.4rem; }
+			.List Array > Object[type=Person] > [name=name] { display: block; font-size: 1.3rem; }
+			.List Array > Object[type=Person] > [name=username] { color: blue; text-decoration: underline; cursor: pointer; }
+			.List Array > Object[type=Person] > [name=email] { color: grey; }
+			.List Array > Object[type=Person] > [name=email]::before { content: "\f422"; display: inline-block;
+	font-family: "Ionicons";
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	text-rendering: auto;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale}
+			.List Array > Object[type=Person] > [name=email]::after { content: "( "attr(value)" )"; }
+			.List Array > Object[type=Person] > [name=address] { color: grey; }
+			.List Array > Object[type=Person] > [name=address] > [name=street] { color: grey; }
+			.List Array > Object[type=Person] > [name=address] > [name=suite] { color: grey; }
+			.List Array > Object[type=Person] > [name=address] > [name=city] { color: grey; }
+			.List Array > Object[type=Person] > [name=address] > [name=zipcode] { color: grey; }
+			.List Array > Object[type=Person] > [name=phone] { color: grey; }
+			.List Array > Object[type=Person] > [name=website] { color: grey; }
+		</xstyle>
+	</head>
+	<body>
+		<header>
+			<button>Prettyprint</button>
+			<button>JS</button>
+			<button>JSON</button>
+			<button>Colors</button>
+			<button>Form</button>
+			<button>List</button>
+		</header>
+		<script>
+			Array.from( document.querySelectorAll('style[less]') )
+				.map( st=> {
+					st.source = st.textContent
+					st.render = vars=> less.render(st.source, vars?{globalVars:vars}:undefined)
+										.then( out=> st.textContent = out.css)
+					st.render( Array.from(st.attributes)
+									.filter(att=>att.name!='less')
+									.reduce((o,att)=>(o[att.name]=att.value,o),{}) )
+				})
+			Array.from( document.querySelectorAll('header button') )
+				.map( b=> b.onclick = e=> document.body.classList.toggle(e.currentTarget.textContent)
+											&& Array.from(document.body.children)
+												.map(n=>document.body.append(n)) )
+				
+			fetch('http://jsonplaceholder.typicode.com/users')
+				.then( res=> res.json() )
+				.then( json=> json.map( o=>(o["@context"]="http://schema.org/",o["@type"]='Person',o) ) )
+				.then( json=> Mutant(json).valueOf() )
+				.then( dom=> (dom.setAttribute('name','users'),dom) )
+				.then( dom=> document.body.append(dom) )
+			
+			var x = new Mutant({
+				aze:42,
+				qsd:34,
+				foo:true, 
+				arr:["aze",42,false], 
+				activity:{
+			      "@context": "http://www.w3.org/ns/activitystreams",
+			      "@type": "Create",
+			      "actor": {
+			        "@type": "Person",
+			        "@id": "acct:sally@example.org",
+			        "displayName": "Sally",
+					birth: new Date
+			      },
+			      "object": {
+			        "@type": "Note",
+			        "content": "This is a simple note"
+			      },
+			      "published": "2015-01-25T12:34:56Z"
+				}
+			})
+			document.body.append( x.valueOf() )
+
+		</script>
+	</body>
+</html>

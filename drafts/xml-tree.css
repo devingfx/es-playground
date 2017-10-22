@@ -1,0 +1,57 @@
+@import 'https://fonts.googleapis.com/css?family=Open+Sans';
+* { font-family: 'Open Sans', sans-serif; }
+* { font-family: monospace; }
+:host { padding: 5px 20px; display: block; background: #EFEFEF; }
+*:focus { outline: none; text-decoration: underline; }
+node,tag { display: block; }
+s,prefix,localNam,childrene { display: inline-block; }
+node { position: relative; }
+tag:hover,
+tag:hover ~ children ~ tag {background: rgba(0, 31, 255, 0.1);text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);}
+tag:hover ~ children {background: rgba(255, 153, 0, 0.1);}
+
+children.open > text:focus { display: block; }
+
+tag { 
+    display: inline-block;
+    color: darkblue;
+    word-spacing: -3px;
+}
+	tag localName { color: #a354c1; margin-left: -4px }
+	tag prefix {
+		color: #0085ff;
+		/* font-style: oblique; */
+		/* 		font-weight: bolder; */
+		/* font-size: 0.8em; */
+		margin-right: -1px;
+		}
+	tag prefix:empty { width: 0px;opacity: 0;margin-left: -1px;}
+	tag prefix:empty:focus { margin-left: 4px;border-bottom: 1px solid red;}
+
+	tag attr { margin-left: 4px; }
+		tag attr s { color: #b98010 }
+		tag attr localName { color: #b98010 }
+		tag attr text { color: green }
+		tag attr text:before { content: '"'; color: #b98010 }
+		tag attr text:after { content: '"'; color: #b98010 }
+
+s {text-decoration: none;margin: 0px -5px 0px 0px;}
+prefix:after { content: ':' }
+children {  }
+children.open { display: block; margin-left: 30px; }
+
+s:last-child {
+    margin-left: -5px;
+}
+
+node .parsererror tag, node .parsererror .h3 { display: none; }
+node .parsererror .div text {color: white;background: #d65858;font-family: 'Open Sans', sans-serif;padding: 2px 6px;font-size: smaller;box-shadow: 6px 4px 10px rgba(0, 0, 0, 0.19);}
+node .parsererror {
+	position: absolute;
+	top: 3rem;
+	left: 16rem;
+	z-index: 10;
+	opacity: 0.5;
+}
+
+node.nom.string { text-shadow: 0 0 2px red,0 0 2px red,0 0 2px red,0 0 2px red,0 0 2px red; }

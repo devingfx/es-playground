@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Tests - live</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="../src/live.js"></script>
+		<style live>
+			body{
+				background-color: #${theme.color1};
+				color: #${theme.color2};
+			}
+			h1 {
+				background-color: #${theme.color3};
+				color: white;
+			}
+			.Place {
+				border: 1px dashed #${theme.color2};
+			}
+		</style>
+		<style>
+			@import 'https://fonts.googleapis.com/css?family=Open+Sans';
+			* { font-family: 'Open Sans', sans-serif; }
+			.Person, .Place {
+				background-color: rgba(255,255,255,.3);
+				width: 24em;
+				height: 8em;
+				padding: 1em;
+				margin: 1em;
+				box-shadow: 1px 1px 0 rgba(0,0,0,.3),-1px -1px 0 rgba(255,255,255,0.5),0 0 12px rgba(0,0,0,.3);
+			}
+				.Person h1, .Place h1 { margin-top: 0; }
+				.Person img.profile, .Place img.logo {
+					float: left;
+					height: 100%;
+					margin-right: 1em;
+				}
+		</style>
+		<script src="../src/live.Editor.js"></script>
+		<script>
+			function GET( what )
+			{
+				return new Promise((ok,ko)=>{
+					let loader = new XMLHttpRequest;
+					loader.onload = ()=> ok(JSON.parse(loader.response));
+					loader.open('GET', what );
+					loader.send();
+				})
+			}
+			
+			// var placeData = {
+			// 		"@context": "http://schema.org/",
+			// 		"@type": "Place",
+			// 		logo: Bindable({value:"http://mtc0.meilleursagents.com/estimates-subregion-idf/2016-09-01/131/18/132760-90228.png?colors=12"}),
+			// 		name: Bindable({value:"Paris"}),
+			// 		address: Bindable({value:"42 av. de par là"}),
+			// 		telephone: Bindable({value:"06 69 118 218"}),
+			// 		smokingAllowed: Bindable({value:false}),
+			// 		description: Bindable({value:"Blah"})
+			// 	},
+			var placeData = BindableProxy({
+					"@context": "http://schema.org/",
+					"@type": "Place",
+					logo: "http://mtc0.meilleursagents.com/estimates-subregion-idf/2016-09-01/131/18/132760-90228.png?colors=12",
+					name: "Paris",
+					address: "42 av. de par là",
+					telephone: "06 69 118 218",
+					smokingAllowed: false,
+					description: "Blah"
+				}),
+				
+				personData = BindableProxy({
+					"@context": "http://schema.org/",
+					"@type": "Person",
+					profile: "http://image.flaticon.com/icons/png/128/149/149452.png",
+					firstName: "Jeanne",
+					lastName: "Dupond",
+					address: "42 av. Utopia",
+					country: "France",
+					telephone: "06 69 69 69 69"
+				}),
+				
+				data = BindableProxy({
+					foo: "bar",
+					tag: "div",
+					name: "Jean",
+					rest: "içi"
+				})
+				
+			var theme = BindableProxy({
+				get color1() { return this._color1 || 'inherit' },
+				set color1(col) {
+					this._color1 = col;
+					this.color2 = col.replace( /(.{2})/g, 
+										n=> Math.floor(parseInt('0x'+n)/2)
+												.toString(16)[0].repeat(2)
+									)
+				},
+				get color2() { return this._color2 || 'inherit' },
+				set color2(col) {
+					this._color2 = col;
+					this.color3 = col.replace( /(.{2})/g, 
+										n=> Math.floor(parseInt('0x'+n)*1.6556)
+												.toString(16)[0].repeat(2)
+									)
+				},
+				get color3() { return this._color3 || 'inherit' },
+				set color3(col) {
+					this._color3 = col;
+				}
+			})
+			
+			GET('http://jsonplaceholder.typicode.com/users')
+				.then( json=> window.people = BindableProxy(json) )
+				
+		</script>
+	</head>
+	<body>
+		
+<template live id="Place">
+	<section class="Place container">
+		<img class="logo" src="${logo}">
+		<h1>${name}</h1>
+		<span>${address}</span>
+		<div class="row">
+			<div class="col-sm-4">${telephone}</div>
+			<div class="col-sm-4">${smokingAllowed}</div>
+			<div class="col-sm-4">${description}</div>
+		</div>
+	</section>
+</template>
+<template id="Col3" live>
+	<div class="row">
+		<div class="col-sm-4">${$0}</div>
+		<div class="col-sm-4">${$1}</div>
+		<div class="col-sm-4">${$2}</div>
+	</div>
+</template>
+
+<my-app live>
+		
+	<div class="${data.foo}">
+		<${data.tag} class="toto" prop="${data.foo}">
+			coucou ${data.name} !!<br>
+			<span>le reste ${data.rest}</span>
+		</${data.tag}>
+	</div>
+	
+	
+	${Place(placeData)}
+	
+	
+	<div class="main">
+		${Col3(data.name,data.address,data.telephone)}
+	</div>
+	
+	<div class="aze">coucou ${data.name} !!</div>
+	
+	<div class="${data.tag}">coucou ${data.name} !!</div>
+	
+	
+	<div class="${data.foo}">
+		<${data.tag} class="toto" prop="${data.foo}">
+			coucou ${data.name} !!<br>
+			<span>le reste ${data.rest}</span>
+		</${data.tag}>
+	</div>
+	
+	<div class="${data.foo}" foo="this is not a tag <- ${data.name} !!! > ">
+		<span>${data.name}</span>
+	</div>
+	<${data.tag} attr="coucou">content</${data.tag}>
+	
+	<complex attr="42" ${data.isCase?'prop="aze"':''}>
+	</complex>
+	
+	
+	<complex attr="42" ${data.isCase?'prop="aze"':''}>
+		<span>${data.name}</span>
+	</complex>
+
+</my-app>
+<script>//"use strict";
+var n;
+
+console.groupCollapsed('live result tests');
+
+n = live``;
+console.assert( typeof n == 'undefined', 'live`` result is not undefined' );
+n = live`coucou`;
+console.assert( n instanceof Node && n instanceof Text, 'live`coucou` result is not a TextNode' );
+n = live`<div>`;
+console.assert( n instanceof Node, 'live`<div>` result is not a Node' );
+
+console.groupEnd();
+
+
+
+
+// document.body.appendChild( live`<h1>Hello ${world = Bindable({value:"world"})} !!</h1>`);
+var world = Property();
+document.body.appendChild( live`<h1>Hello ${world} !!</h1>`);
+
+// data.prop( "Thomas" )
+
+
+
+// Template functions
+function Person( data )
+{
+	with(data){
+		return live`
+			<section class="Person container">
+				<img class="profile" src="${profile}">
+				<h1>${firstName} ${lastName}</h1>
+				<span>${country}</span>
+			</section>
+			`;
+	}
+}
+
+var Person = data => live`
+		<section class="Person container">
+			<img class="profile" src="${data.profile}">
+			<h1>${data.firstName} ${data.lastName} (${data.username})</h1>
+			<div class="info telephone">${data.telephone}</div>
+			<div class="info address">${data.address}</div>
+			<div class="info country">${data.country}</div>
+			<div class="info country">${data.email}</div>
+		</section>
+		`
+// <div class="${json.id > 4 ? 'new ':''}col-sm-4">${json.telephone}</div>
+// <div class="${live(['',">4?'new':''"], json.id)}col-sm-4">${json.telephone}</div>
+// <div class="${live(v=>v>4?'new':'', json.id)}col-sm-4">${json.telephone}</div>
+// <div class="${bb=Bindable({value: json.id>4}),json.id.on(e=> bb(e.new>4?'new':'')),bb}col-sm-4">${json.telephone}</div>
+// <div class="${live`${json.id} > 4 ? 'new ':''`}col-sm-4">${json.telephone}</div>
+// <div class="${Bindable(json.id>4).bind(json.id,v=>v>4)}col-sm-4">${json.telephone}</div>
+// <div class="${Bindable({value:json.id>4}).bind(json.id,v=>v>4)}col-sm-4">${json.telephone}</div>
+
+
+
+
+var editor1 = new Editor(personData);
+document.body.appendChild( editor1.pre );
+
+
+var person = Person( personData )
+document.body.appendChild( person );
+
+
+var list = BindableProxy([
+		
+	]);
+	
+
+var Col3 = ($1,$2,$3)=>live`
+<div id="Clol3" class="row">
+	<div class="col-sm-4">${$1}</div>
+	<div class="col-sm-4">${$2}</div>
+	<div class="col-sm-4">${$3}</div>
+</div>
+`
+
+
+var editor2 = new Editor(data);
+document.body.appendChild( editor2.pre );
+
+
+// Attribute text binding
+var n6 = live`<span id="n6" class="${data.foo}"></span>`
+document.body.appendChild( n6 );
+
+var n7 = live`<span id="n7" class="${data.foo} ${data.name}"></span>`
+document.body.appendChild( n7 );
+
+var n8 = live`<span id="n8" class="before ${data.foo} ${data.name} after"></span>`
+document.body.appendChild( n8 );
+
+var n9 = live`<span id="n9" class="before ${data.foo} ${data.name} after" title="${data.name}"></span>`
+document.body.appendChild( n9 );
+
+
+// Text node text binding
+var n1 = live`
+<div id="n1" class="aze">coucou ${data.name} !!</div>`;
+document.body.appendChild( n1 );
+
+
+// Attribute text uinding + Text node text binding
+var n2 = live`
+<div id="n2" class="${data.tag}">coucou ${data.name} !!</div>`;
+document.body.appendChild( n2 );
+
+// Tag name binding
+var n3 = live`
+<div id="n3" class="${data.foo}">
+	<${data.tag} class="toto" prop="${data.foo}">
+		coucou ${data.name} !!<br>
+		<span>le reste ${data.rest}</span>
+	</${data.tag}>
+</div>`;
+document.body.appendChild( n3 );
+
+var n4 = live`
+<div id="n4" class="${data.foo}" foo="this is not a tag <- ${data.name} !!! > ">
+	<span>${data.name}</span>
+</div>
+<${data.tag} attr="coucou">content</${data.tag}>
+
+<complex id="n4" attr="42" ${data.isCase?'prop="aze"':''}>
+</complex>
+`
+document.body.appendChild( n4 );
+
+var n5 = live`
+<button id="n5" onclick="${e=>console.info('button clicked: %o\ndata: %o',e.target, data)}">
+	 <span>${data.tag}</span>
+</button>
+`
+document.body.appendChild( n5 );
+
+
+var editor3 = new Editor(placeData);
+document.body.appendChild( editor3.pre );
+
+// Template call + element replacement
+var n0 = live`
+<div id="n0" class="main">
+	${Col3( placeData.name, placeData.address, placeData.telephone )}
+</div>`;
+document.body.appendChild( n0 );
+
+
+
+var editor4 = new Editor(theme);
+document.body.appendChild( editor4.pre );
+
+console.log('aze');
+
+with(theme)
+{
+	document.head.appendChild(live`
+		<style>
+			body{
+				background-color: #${color1};
+				color: #${color2};
+			}
+			h1 {
+				background-color: #${color3};
+				color: white;
+			}
+		</style>
+	`)
+}
+
+// theme.color1('FFFFFF');
+theme.color1 = '607D8B';
+
+
+
+var mouse = {
+	x: Bindable({value:0}),
+	y: Bindable({value:0})
+};
+// window.addEventListener('mousemove', e=> (mouse.x(e.clientX+window.scrollX),mouse.y(e.clientY+window.scrollY)) )
+
+// document.body.appendChild( live`<img src="http://icons.iconarchive.com/icons/umut-pulat/tulliana-2/128/mouse-icon.png" style="position:absolute;margin: 10px -118px;top:${mouse.y}px;left:${mouse.x}px;"/>` );
+
+
+</script>
+	</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Tests - </title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="../src/micro.js"></script>
+		<script src="../src/log.js"></script>
+		<!--<script src="../src/stremplate.js"></script>-->
+		<!--<script src="../src/e4x.js"></script>-->
+		<script src="../src/Mutants.js"></script>
+	</head>
+	<body>
+	    
+<script>"use strict";
+
+
+
+// ES6 playground //
+
+class toto {}
+class toto2 {}
+toto2.toString = _ => `[Class ns.pack.Toto]`
+
+// All this is ok and serialized as  string
+var substitute = 'who'
+  , o = {
+        [3]                         :1
+    ,   aze                         :1
+    ,   [-1]                        :1
+    ,   [[2,,5]]                    :1
+    ,   [[2,3]]                     :1
+    ,   [/aze/ig]                   :1
+    ,   [/a/]                       :1
+    ,   [/aze\/aze/]                :1
+    ,   ['/gi']                     :1
+    ,   ['//']                      :1
+    ,   ['aze/']                    :1
+    ,   [/<(.*?)>/g]                :1
+    ,   [o=>o]                      :1
+    ,   [e=>e.preventDefault()]     :1
+    ,   [ o => o.prop == true ]     :1
+    ,   [ (o,i) => i > 42 ]         :1
+    // ,   [toto]                      :1
+    // ,   [toto2]                     :1
+    ,   [`whatever `]               :1
+    ,   [`with ${substitute}`]      :1
+    ,   [``]                        :1
+    ,   ['2,,/aze/']                :1
+    }
+  ;
+
+var res = {
+        isSym: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    ,   isNum: [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    ,   isArr: [0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+    ,   isStr: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    ,   isReg: [0,0,0,0,0,1,1,1,0,1,0,1,0,0,0,0,0,0,0,0]
+    ,   isFun: [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0]
+    }
+console.assert(
+    Object.getOwnPropertyNames(o).map( n => isSym(n) )
+        .every( (b,i) => b == res.isSym[i] )
+,    "isSym bad results"
+)
+console.assert(
+    Object.getOwnPropertyNames(o).map( n => isNum(n) )
+        .every( (b,i) => b == res.isNum[i] )
+,    "isNum bad results"
+)
+console.assert(
+    Object.getOwnPropertyNames(o).map( n => !!isArr(n) )
+        .every( (b,i) => b == res.isArr[i] )
+,    "isArr bad results"
+)
+console.assert(
+    Object.getOwnPropertyNames(o).map( n => isStr(n) )
+        .every( (b,i) => b == res.isStr[i] )
+,    "isStr bad results"
+)
+console.assert(
+    Object.getOwnPropertyNames(o).map( n => !!isReg(n) )
+        .every( (b,i) => b == res.isReg[i] )
+,    "isReg bad results"
+)
+console.assert(
+    Object.getOwnPropertyNames(o).map( n => !!isFun(n) )
+        .every( (b,i) => b == res.isFun[i] )
+,    "isFun bad results"
+)
+
+// Objet Magique Non Identifié - UMO Unknown Magical Object
+// var UMO
+//   , OMNI = UMO = {
+//         get: Symbol`UMO.get`
+//       , set: Symbol`UMO.get`
+//     }
+//   ;
+
+
+// Object.defineProperties( Object.prototype, {
+//     [OMNI.get]: {
+//         set: function( set ){ return }
+//       , get: function(){}
+//     }
+// })
+
+
+
+// proxy[OMNI.get] = (o,p) => o[p];
+
+// var obj = {}
+//   ;
+
+// var aze = obj[OMNI.get] = (o,p) => o[p];
+
+var xman = new Mutant();
+// var tornade = new Mutant('tornade');
+var cyclope = new Mutant({eyes:s=>console.error('%s%c%s','<)--------------','background:red;color:pink',s)});
+
+cyclope.eyes('roof');            // <)--------------roof
+
+// var wolverine = {}
+//                 [Mutant.symbol][Mutant.get]( (o,p)=>p.toUppercase()+'  grrrrr !!' )
+// wolverine[Mutant.get]( (o,p)=>p.toUppercase()+'  grrrrr !!' )
+
+
+// With arrays
+
+
+
+
+var collection = new Mutant([
+        { id:9, name:"foo", cat:'bar' }
+      , { id:8, name:"blah", cat:'plurp' }
+      , { id:2, name:"pure", cat:'plurp' }
+      , { id:6, name:"hi", cat:'baz' }
+      , { id:1, name:"boo", cat:'aze' }
+      , { id:4, name:"floor", cat:'bar' }
+      , { id:7, name:"choux", cat:'plurp' }
+      , { id:1000, name:"hiboux", cat:'bar' }
+      , { id:3, name:"genoux", cat:'baz' }
+      , { id:5, name:"cailloux", cat:'aze' }
+    ]);
+collection[Mutant.get]({
+	[RegExp]: (o,r)=> o.filter( item=> r.test(item.name) )
+// ,   [String]: (o,a)=> a.map( i=> o[i] )
+,   [Array]: (o,a)=> a.map( i=> o[i] )
+,   [Number]: (o,n)=> n < 0 ? o[o.length+n] 
+							: o[Mutant.index] ? o.filter(item=>item[o[Mutant.index]]==n)[0]
+							: o[n]
+})
+
+   /*[Mutant.symbol]({
+        get: function( o, p )
+        {
+            // log`Hello ${p}o do you exist?`;
+            
+            // console.info('GET(%o,%o,%o)[%d]',o,p,v, this.length)
+            var fn = getCompiledFunction(p);
+            // debugger;
+            let regex = toRegex(name);
+            if (regex)
+                fn = (n) => typeof n === 'string' && regex.test(n);
+            
+            if (typeof fn == 'function') {
+                return o.filter(fn);
+              }
+            return o[p];
+        }
+      , set: function( o, p, v )
+        {
+            
+            o[p] = v;
+        }
+      , toto(){return 'ok'}
+    })*/
+
+
+
+
+
+
+// var friends = {
+//         Vanessa: 'Copycat'
+//       , Neena: 'Domino'
+//     }
+//     [Mutant.symbol]( Mutant.lib.regexSearch );
+
+// console.log(/^van/ in friends) //=> true
+// console.log(delete friends[/^N\w+/]); //=> true
+// console.log(delete friends[/^nathan/]); //=> false
+// console.log(friends); //=> { Vanessa: 'Copycat' }
+
+
+
+
+console.assert(
+    collection[0].name == 'foo'
+,    "collection[0] bad results"
+)
+console.assert(
+    collection[3].name == 'hi'
+,    "collection[3] bad results"
+)
+console.assert(
+	collection[[6,4,2,7]]   // [ hi, floor, pure, choux ]
+     == 'hi'
+,    "collection[3] bad results"
+)
+console.assert(
+	collection[[2,,7]]      // [ pure, genoux, floor, cailloux, hi, choux ]
+     == 'hi'
+,    "collection[3] bad results"
+)
+console.assert(
+	collection[-2]          // { name: "genoux", ... }
+     == 'hi'
+,    "collection[3] bad results"
+)
+
+
+collection[Mutant.index] = 'id'
+
+console.assert(
+    !collection[0]
+,    "collection[id:0] bad results"
+)
+console.assert(
+    collection[2].name == 'pure'
+,    "collection[id:2] bad results"
+)
+console.assert(
+    collection[1000].name == 'hiboux'
+,    "collection[id:1000] bad results"
+)
+
+
+/*
+// collection.sort("name")
+collection[0]           // undefined
+collection[2]           // { name: "pure", ... }
+collection[1000]        // { name: "hiboux", ... }
+collection[[6,4,2,7]]   // [ hi, floor, pure, choux ]
+collection[[2,,7]]      // [ pure, genoux, floor, cailloux, hi, choux ]
+delete collection[Mutant.index];
+collection[0]           // { name: "foo", ... }
+collection[Mutant.index] = 'cat';
+collection.plurp        // [ blah, pure, choux ]
+
+
+collection[Mutant.default] = 'name';
+collection.floor		// { name: "floor", ... }
+collection[/oo/]        // [ foo, boo, floor ]
+collection[/oux$/]      // [ choux, huboux, genoux, cailloux ]
+collection[/^.{2,4}$/]  // [ foo, blah, pure, hi, boo ]
+
+
+collection[o => o.cat == 'aze']  // [ boo, cailloux ]
+collection[o => o.id < 5]  // [ pure, boo, floor, genoux ]
+collection[o => o.cat == 'plurp'].map( o=> `${o.id}::${o.name}/${o.cat}` )
+collection[o => o.cat == 'plurp'].map( o=> `
+    <item id="${o.id}">
+        <name>${o.name}</name>
+        <cat>${o.cat}</cat>
+    </item>
+`)
+
+collection[ change => doSomething( e.details ) ]
+collection[ added => doSomething( e.details ) ]
+collection[ removed => doSomething( e.details ) ]
+
+collection.map( Member );
+
+
+collection[o=>o.isMember()] = 'members'
+collection.members.map( item=> doSomething(item) )
+collection[o=>o.isMember()].map( item=> doSomething(item) )
+
+collection[o=>o.isMember()] = item=> doSomething(item)
+collection[o=>o.isMember()] = { member: true }
+collection[/oo/] = { doubleZeroAgent: true }
+;
+/^F/ in collection
+*/
+
+
+// Ecmascript for html5
+var e4h5 = {
+	flatten: (p,c)=> p.concat( Array.from(c) )
+,	[RegExp]: (o,r)=> o.filter( item=> r.test(item.name) )
+,	[String]: (o,s)=> s[0] == '$'
+						? 	new Mutant(
+								o.map( node=> node.attributes[s.substr(1)] )
+								 .filter( o=> typeof o != 'undefined' )
+							)
+							[Mutant.get]( e4h5 )
+						: s == '_' 
+						? 	new Mutant(
+								o.map( node=> node.querySelectorAll('*') )
+								 .reduce(e4h5.flatten, [])
+							)
+							[Mutant.get]( e4h5 )
+						: 	new Mutant(
+								o.map( node=> node.querySelectorAll(s) )
+								 .reduce(e4h5.flatten, [])
+							)
+							[Mutant.get]( e4h5 )
+// ,	[Array]: (o,a)=> a.map( i=> o[i] )
+,	[Number]: (o,n)=> n < 0 ? o[o.length+n] 
+							: o[n]
+}
+var root = new Mutant( [document.documentElement] )
+root[Mutant.get]( e4h5 )
+
+var html = root
+
+html
+html.body
+
+html[0]
+
+// html[Mutant.index] = 'nodeType'
+// html[Node.COMMENT_NODE]
+// html[Node.TEXT_NODE]
+// html[Node.ELEMENT_NODE]
+// delete html[Mutant.index]
+
+html['#foo']
+html['.bar']
+html['.bar.baz > img']
+html['img.logo']
+html.img.logo
+
+html[/foo/i]
+
+
+html.body.div[o=>o.classList.has('aze')]
+html.body.div`classList.has('aze')`
+gens.personne`age > 40`
+
+
+
+html.body.div[o=>o.classList.has('aze')]
+html.body.div`classList.has('aze')`
+gens.personne`age > 40`
+
+
+
+// With objects
+
+var obj = {}[Mutant.symbol]({
+        get: (o,p) => (log.I`Ha! A pirate want to read ${p}o at ${Date.now()}s`,Reflect.get(o,p)) 
+    });
+
+obj = obj[Mutant.symbol]({
+    set: (o,p,v) => alert(`Booh! Tu veux changer ${p} pour ${v}!!`) 
+})
+obj.coucou ='monde'
+obj = obj[Mutant.symbol]({
+    get: (o,p) => (console.error(Math.random()),Reflect.get(o,p)) 
+})
+// You see error 1st, then info
+
+
+
+
+// With strings
+
+// var str = new Proxy( {value:"abcdefghijklmnopqrstuvwxyz"}, {get:function(o,p){console.log(p);return o.value[p]}})
+var str = new Mutant( "abcdefghijklmnopqrstuvwxyz");
+str[Mutant.get] = Mutant['negative-index'];
+str[Mutant.get] = Mutant['range-index'];
+str[Mutant.get] = Mutant['regex-property'];
+str[Mutant.get] = Mutant['string-property'];
+
+str[0]							// "a"
+str[-1]							// "z"
+str[[2,7]]						// "ch"
+str[[4,-5]]						// "ev"
+str[[4,,9]]						// "efghij"
+str[[7,,-3]]					// "hijklmnopqrstuvw"
+str[/def.{3}?/]					// true > if regex begin by '?' regex.test()
+str[/def.{3}/]					// "defghi" > without '?' regex.exec()
+str[/^ab(.{3}).*?o(.*?)v/]		// ["cde","pqrstu"]
+str['de']						// 3  > .indexOf
+
+
+
+var m = new Mutant();           // or new Mutant( value )
+m[Mutant.value] = "aze";        //
+m[Mutant.get] = (o,p)=> o[p];   // normal behavior
+m[Mutant.get] = (o,p)=> o[p];   // custom behavior
+m[Mutant.get.array] = (o,p)=> o[p];   // custom behavior
+m[Mutant.get.regex] = (o,p)=> o[p];   // custom behavior
+m[Mutant.get.arrow] = (o,p)=> o[p];   // custom behavior
+m[Mutant.set] = (o,p)=> o[p];   // custom behavior
+
+m[Mutant.get] = {
+    [RegExp]: (o,r)=> Reflect.ownKeys(o).filter(key=>r.test(key))
+,   [String]: (o,p)=> /length/i.test(p) && `${o.AZE}ooooooooooo`
+,   [String]: (o,p)=> /aze?/i.test(p) && p.length == 3 ? o.AZE.toUpperCase() : o.AZE.toLowerCase()
+,   [/num(.*)$/]:(o,p)=> o.AZE
+};
+
+m.AZE = "Hello";
+console.log( m.azE, m.Aze, m.az );           // "HELLO" "HELLO" "hello"
+
+
+
+m[`get = (o,p)=> o[p]`]
+
+
+// With class
+
+class XMen extends Mutant {
+    [Mutant.get]( o,p )
+    {
+        return Reflect.get(o,p) + ' with a wonderfull suit!'
+    }
+    
+}
+
+
+
+/*
+var str = "abcdefghijklmnopqrstuvwxyz"
+            [Mutant.symbol]
+                [Mutant.getters].push(
+                    Mutant['negative-index']
+                  , Mutant['range-index']
+                  , Mutant['regex-property']
+                  , Mutant['string-property']
+                )
+                [Mutant.set](
+                    Mutant['negative-index']
+                  , Mutant['range-index']
+                  , Mutant['regex-property']
+                  , Mutant['string-property']
+                )
+                [Mutant.apply](
+                    Mutant['negative-index']
+                  , Mutant['range-index']
+                  , Mutant['regex-property']
+                  , Mutant['string-property']
+                )
+    
+
+var str = new Mutant( "abcdefghijklmnopqrstuvwxyz");
+str[Mutant.get] = Mutant['negative-index'];
+str[Mutant.get] = Mutant['range-index'];
+str[Mutant.get] = Mutant['regex-property'];
+str[Mutant.get] = Mutant['string-property'];
+
+*/
+
+// OMNI (old)
+
+
+// Objet Magique Non Identifié - UMO Unknown Magical Object
+// var UMO
+//   , OMNI = UMO = {
+//         get: Symbol`UMO.get`
+//       , set: Symbol`UMO.get`
+//     }
+//   ;
+
+
+// Object.defineProperties( Object.prototype, {
+//     [OMNI.get]: {
+//         set: function( set ){ return }
+//       , get: function(){}
+//     }
+// })
+
+
+
+// proxy[OMNI.get] = (o,p) => o[p];
+
+// var obj = {}
+//   ;
+
+// var aze = obj[OMNI.get] = (o,p) => o[p];
+
+
+
+</script>
+
+<catalog>
+	<div id="item-0">
+		<span>
+			<a href="aze"><i class="ico"></i>AZE</a>
+		</span>
+		<span>
+			<a href="foo"><i class="ico"></i>FOO</a>
+		</span>
+	</div>
+	<div id="item-1">
+		<span>
+			<a href="aze"><i class="ico"></i>AZE - 1</a>
+		</span>
+		<span>
+			<a href="foo"><i class="ico"></i>FOO - 1</a>
+		</span>
+	</div>
+	<div id="item-2">
+		<span>
+			<a href="aze"><i class="ico"></i>AZE - 2</a>
+		</span>
+		<span>
+			<a href="foo"><i class="ico"></i>FOO - 2</a>
+		</span>
+	</div>
+</catalog>
+
+	</body>
+</html>

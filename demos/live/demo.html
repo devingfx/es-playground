@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>live - demos</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<!--<script src="../../src/micro.js"></script>-->
+		<!--<script src="../../src/e4x.js"></script>-->
+		<script src="../../src/live.js"></script>
+		<script src="../xml-tree/xml-tree.js"></script>
+		<style live>
+			body{
+				background-color: #${theme.color1};
+				color: #${theme.color2};
+			}
+			h1 {
+				background-color: #${theme.color3};
+				color: white;
+			}
+			.Place {
+				border: 1px dashed #${theme.color2};
+			}
+			demo > section:before { border-bottom-color: ${theme.color3}; }
+		</style>
+		<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>-->
+		<style>
+			@import 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,700';
+			body, section { font-family: 'Open Sans', sans-serif; }
+			my-app {
+				width: 50%;
+				display: block;
+				margin: auto;
+			}
+				my-app nav {
+					position: fixed;
+					left: 0;
+					display: flex;
+					flex-direction: column;
+					width: 300px;
+				}
+			section {
+				padding: 4em 0 2em 0;
+				border: 1px dashed;
+				/*display: flex;*/
+				position: relative;
+			}
+				section:before {
+					content: attr(title);
+					position: absolute;
+					top: 0.3em;
+					left: 1em;
+					color: white;
+					font-size: 2em;
+					text-shadow: 0 1px 0 black;
+					text-transform: uppercase;
+					font-weight: 100;
+				}
+				section:after {
+					clear: both;
+				}
+				section demo {
+					flex: 2;
+				}
+					demo > section {
+						display: block;
+					}
+						demo > section:before {
+							font-size: 1.5em;
+							border-bottom: 2px solid;
+							width: 50%;
+						}
+				section editor {
+					flex: 1;
+					height: 100%;
+				}
+			samp, code, pre, xml-tree {
+				display: inline-block;
+				background: lightgrey;
+				margin: .3em;
+				padding: .3em;
+				background: rgba(255,255,255,.6);
+				box-shadow: -1px -1px 0 rgba(0,0,0,.3),1px 1px 0 rgba(255,255,255,0.5),inset 0 0 6px rgba(0,0,0,.3);
+				tab-size: 4;
+			}
+			code, pre, xml-tree {
+				display: block;
+			}
+				code v-node, pre v-node { border-bottom: 1px dashed; background: rgba(255,255,0,0.5); }
+				code, code *, pre, pre * {
+					font-family: monospace;
+					white-space: pre;
+				}
+				pre r,
+				code r { color: red }
+				pre g,
+				code g { color: green }
+				pre b,
+				code b { color: blue; font-weight: normal; }
+				pre y,
+				code y { color: yellow }
+				pre n,
+				code n { color: black }
+				pre o,
+				code o { color: #b57a0f }
+				pre pu,
+				code pu { color: purple }
+				
+			.urgent { color: red; }
+			.complete { color: green; }
+			.info { color: blue; }
+			.warning { color: orange; }
+			
+			.container {
+				min-height: 130px;
+			}
+			.container img {
+				width: 128px;
+			}
+			.Person, .Place {
+				background-color: rgba(255,255,255,.3);
+				width: 24em;
+				/*height: 8em;*/
+				padding: 1em;
+				margin: 1em;
+				box-shadow: 1px 1px 0 rgba(0,0,0,.3),-1px -1px 0 rgba(255,255,255,0.5),0 0 12px rgba(0,0,0,.3);
+			}
+				.Person h1, .Place h1 { margin-top: 0; }
+				.Person img.profile, .Place img.logo {
+					float: left;
+					/*height: 100%;*/
+					margin-right: 1em;
+				}
+		</style>
+		<script src="../../src/live.Editor.js"></script>
+		<script>
+			function GET( what )
+			{
+				return new Promise((ok,ko)=>{
+					let loader = new XMLHttpRequest;
+					loader.onload = ()=> ok(JSON.parse(loader.response));
+					loader.open('GET', what );
+					loader.send();
+				})
+			}
+			
+			// var placeData = {
+			// 		"@context": "http://schema.org/",
+			// 		"@type": "Place",
+			// 		logo: Bindable({value:"http://mtc0.meilleursagents.com/estimates-subregion-idf/2016-09-01/131/18/132760-90228.png?colors=12"}),
+			// 		name: Bindable({value:"Paris"}),
+			// 		address: Bindable({value:"42 av. de par là"}),
+			// 		telephone: Bindable({value:"06 69 118 218"}),
+			// 		smokingAllowed: Bindable({value:false}),
+			// 		description: Bindable({value:"Blah"})
+			// 	},
+			var placeData = BindableProxy({
+					"@context": "http://schema.org/",
+					"@type": "Place",
+					logo: "http://mtc0.meilleursagents.com/estimates-subregion-idf/2016-09-01/131/18/132760-90228.png?colors=12",
+					name: "Paris",
+					address: "42 av. de par là",
+					telephone: "06 69 118 218",
+					smokingAllowed: false,
+					description: "Blah"
+				}),
+				
+				personData = BindableProxy({
+					"@context": "http://schema.org/",
+					"@type": "Person",
+					profile: "https://placekitten.com/g/128/170",
+					firstName: "Jeanne",
+					lastName: "Dupond",
+					username: "Jeannette",
+					email: "42@Utopia.coop",
+					address: "42 av. Utopia",
+					country: "France",
+					telephone: "06 69 69 69 69"
+				}),
+				
+				data = BindableProxy({
+					state: "urgent",
+					foo: "bar",
+					tag: "div",
+					name: "Jean",
+					rest: "içi"
+				})
+			var menu = ["Menu 1","Menu 2","Menu 3"]
+			var theme = BindableProxy({
+				get color1() { return this._color1 || 'inherit' },
+				set color1(col) {
+					this._color1 = col;
+					this.color2 = col.replace( /(.{2})/g, 
+										n=> Math.floor(parseInt('0x'+n)/2)
+												.toString(16)[0].repeat(2)
+									)
+				},
+				get color2() { return this._color2 || 'inherit' },
+				set color2(col) {
+					this._color2 = col;
+					this.color3 = col.replace( /(.{2})/g, 
+										n=> Math.floor(parseInt('0x'+n)*1.6556)
+												.toString(16)[0].repeat(2)
+									)
+				},
+				get color3() { return this._color3 || 'inherit' },
+				set color3(col) {
+					this._color3 = col;
+				}
+			})
+			theme.color1 = '607D8B';
+			
+			var who = Property({value:'Doctor'})
+			
+			GET('http://jsonplaceholder.typicode.com/users')
+				.then( json=> window.people = BindableProxy(json) )
+				
+		</script>
+	</head>
+	<body>
+		
+<template live id="Person">
+	<div class="Person container">
+		<img class="profile" src="${profile}">
+		<h1>${firstName} ${lastName} (${username})</h1>
+		<div class="info telephone">${telephone}</div>
+		<div class="info address">${address}</div>
+		<div class="info country">${country}</div>
+		<div class="info country">${email}</div>
+	</div>
+</template>
+<template live id="Place">
+	<div class="Place container">
+		<img class="logo" src="${logo}">
+		<h1>${name}</h1>
+		<span>${address}</span>
+		<div class="row">
+			<div class="col-sm-4">${telephone}</div>
+			<div class="col-sm-4">${smokingAllowed}</div>
+			<div class="col-sm-4">${description}</div>
+		</div>
+	</div>
+</template>
+<template id="Col3" live>
+	<div class="row">
+		<div class="col-sm-4">${$0}</div>
+		<div class="col-sm-4">${$1}</div>
+		<div class="col-sm-4">${$2}</div>
+	</div>
+</template>
+
+<my-app live>
+	
+	<nav>
+		${menu.map( link=>
+			live`<button>${link}</button>`
+		)}
+	</nav>
+	
+	<section title="Quick start">
+		<p>With live template strings you can make you UI updates when the data changes.<br/>
+		To acheive this, you need use the <b>live</b> function as a template string tag,
+		with the new es6 backtick strings <samp>\`</samp>, this will transform the markup string provided into real DOM objects:</p>
+		<code>
+			var myDiv = live\`<div>Hello</div>\`
+			console.log( myDiv.tagName ) // "div"
+		</code><br/>
+		
+		OK, this is boring!! But what are the advantages?<br/>
+		First, you gain advantages from new es6 template string like the
+		ability to have multiline, to avoid the quote escaping nightmare,
+		and then, the most exciting feature is the placeholders with <samp>\${var}</samp>:<br/>
+		<code>
+			var who = "Doctor"
+			var myDiv = live\`<div>
+				<span class="greetings">Hello</span>
+				\${who} !
+			</div>\`
+		</code>
+		Outputs :
+		<xml-tree>
+			<div>
+				<span class="greetings">Hello</span>
+				${who} !
+			</div>
+		</xml-tree>
+		
+		
+		
+	
+	
+	First you have to make your data bindable:<br/>
+	
+	<code>
+		var myData = BindableProxy({
+			your: "plain",
+			data: "object"
+		})
+	</code><br/>
+	
+	This makes the properties of your object emitting changes event:<br/>
+	<code>
+		myData.your.on( e=> console.info('myData.your cahnged from %s to %s', e.old, e.new ) )
+		// then
+		myData.your = 'world' // {type: "propertyChange", old: "plain", new: "world"}
+	</code><br/>
+	
+	You can create a standalone bindable property with <b>Property</b>:<br/>
+	<code>
+		var title = Property({value: "Hello world"})
+	</code><br/>
+	
+	Once 
+	</section>
+	
+	<section title="With a person">	
+		<demo>
+			<code>var personData = BindableProxy({
+		"@context": "http://schema.org/",
+		"@type": "Person",
+		profile: "https://placekitten.com/g/128/170",
+		firstName: "Jeanne",
+		lastName: "Dupond",
+		username: "Jeannette",
+		email: "42@Utopia.coop",
+		address: "42 av. Utopia",
+		country: "France",
+		telephone: "06 69 69 69 69"
+	})</code>
+			<code>var Person = data => live\`
+	<div class="Person container">
+		<img class="profile" src="\${data.profile}">
+		<h1>\${data.firstName} \${data.lastName} (\${data.username})</h1>
+		<div class="info telephone">\${data.telephone}</div>
+		<div class="info address">\${data.address}</div>
+		<div class="info country">\${data.country}</div>
+		<div class="info country">\${data.email}</div>
+	</div>\`
+document.body.appendChild( Person(personData) );</code>
+		
+			<br/>
+			<xml-tree>
+				<div class="Person container">
+					<img class="profile" src="\${personData.profile}">
+					<h1>\${personData.firstName} \${personData.lastName} (\${personData.username})</h1>
+					<div class="info telephone">\${personData.telephone}</div>
+					<div class="info address">\${personData.address}</div>
+					<div class="info country">\${personData.country}</div>
+					<div class="info email">\${personData.email}</div>
+				</div>
+			</xml-tree>
+			<br/>
+			${person = Person( personData )}
+			<br/>
+		</demo>
+		${editor1 = new Editor(personData),editor1.pre}
+	</section>
+	
+	<section title="With a place">
+		<demo>
+			${place = Place(placeData)}
+		</demo>
+		${editor2 = new Editor(placeData),editor2.pre}
+	</section>
+	
+	
+	<section title="With theme">
+		<demo>
+		</demo>
+		${editor4 = new Editor(theme),editor4.pre}
+	</section>
+	
+	
+	<section title="With dumb">
+		<demo>
+			<code>var data = Bindable({
+		state: "urgent",
+		foo: "bar",
+		tag: "div",
+		name: "Jean",
+		rest: "içi"
+	})</code>
+			<section title="Attribute text binding">
+				
+				<code>document.body.appendChild( live\`<span class="\${data.state}">\${data.foo}</span>\` )</code>
+				<br/>
+				<code><span class="${data.state}">${data.foo}</span></code>
+				<br/>
+				${n6 = live`<span id="n6" class="${data.state}">${data.foo}</span>`}
+				<br/>
+				
+				<code>document.body.appendChild( live\`<span id="n7" class="\${data.state} \${data.name}">\${data.foo}</span>\` )</code>
+				<br/>
+				<code><span class="${data.state} ${data.name}">${data.foo}</span></code>
+				<br/>
+				${n7 = live`<span id="n7" class="${data.state} ${data.name}">${data.foo}</span>`}
+				<br/>
+				
+				<code>document.body.appendChild( live\`<span id="n8" class="before \${data.state} \${data.name} after">\${data.foo}</span>\` )</code>
+				<br/>
+				<code><span class="before ${data.state} ${data.name} after">${data.foo}</span></code>
+				<br/>
+				${n8 = live`<span id="n8" class="before ${data.state} ${data.name} after">${data.foo}</span>`}
+				<br/>
+				
+				<code>document.body.appendChild( live\`<span id="n9" class="before \${data.state} \${data.name} after" title="\${data.name}">\${data.foo}</span>\` )</code>
+				<br/>
+				<code><span class="before ${data.state} ${data.name} after" title="${data.name}">${data.foo}</span></code>
+				<br/>
+				${n9 = live`<span id="n9" class="before ${data.state} ${data.name} after" title="${data.name}">${data.foo}</span>`}
+				<br/>
+				
+			</section>
+
+
+		</demo>
+		${editor3 = new Editor(data),editor3.pre}
+	</section>
+	
+</my-app>
+
+<script type="nope!">//"use strict";
+
+
+
+// Template functions
+var Person = data => live`
+		<div class="Person container">
+			<img class="profile" src="${data.profile}">
+			<h1>${data.firstName} ${data.lastName} (${data.username})</h1>
+			<div class="info telephone">${data.telephone}</div>
+			<div class="info address">${data.address}</div>
+			<div class="info country">${data.country}</div>
+			<div class="info country">${data.email}</div>
+		</div>
+		`
+
+
+// var editor1
+//   , editor2
+//   , editor3
+//   , editor4
+//   , editor5
+//   , person
+//   ;
+// var editor1 = new Editor(personData);
+// document.body.appendChild( editor1.pre );
+
+
+// var person = Person( personData )
+// document.body.appendChild( person );
+
+
+
+var Col3 = ($1,$2,$3)=>live`
+<div id="Clol3" class="row">
+	<div class="col-sm-4">${$1}</div>
+	<div class="col-sm-4">${$2}</div>
+	<div class="col-sm-4">${$3}</div>
+</div>
+`
+
+
+// var editor2 = new Editor(data);
+// document.body.appendChild( editor2.pre );
+
+
+// Attribute text binding
+var n6 = live`<span id="n6" class="${data.foo}"></span>`
+document.body.appendChild( n6 );
+
+var n7 = live`<span id="n7" class="${data.foo} ${data.name}"></span>`
+document.body.appendChild( n7 );
+
+var n8 = live`<span id="n8" class="before ${data.foo} ${data.name} after"></span>`
+document.body.appendChild( n8 );
+
+var n9 = live`<span id="n9" class="before ${data.foo} ${data.name} after" title="${data.name}"></span>`
+document.body.appendChild( n9 );
+
+
+// Text node text binding
+var n1 = live`
+<div id="n1" class="aze">coucou ${data.name} !!</div>`;
+document.body.appendChild( n1 );
+
+
+// Attribute text uinding + Text node text binding
+var n2 = live`
+<div id="n2" class="${data.tag}">coucou ${data.name} !!</div>`;
+document.body.appendChild( n2 );
+
+// Tag name binding
+var n3 = live`
+<div id="n3" class="${data.foo}">
+	<${data.tag} class="toto" prop="${data.foo}">
+		coucou ${data.name} !!<br>
+		<span>le reste ${data.rest}</span>
+	</${data.tag}>
+</div>`;
+document.body.appendChild( n3 );
+
+var n4 = live`
+<div id="n4" class="${data.foo}" foo="this is not a tag <- ${data.name} !!! > ">
+	<span>${data.name}</span>
+</div>
+<${data.tag} attr="coucou">content</${data.tag}>
+
+<complex id="n4" attr="42" ${data.isCase?'prop="aze"':''}>
+</complex>
+`
+document.body.appendChild( n4 );
+
+var n5 = live`
+<button id="n5" onclick="${e=>console.info('button clicked: %o\ndata: %o',e.target, data)}">
+	 <span>${data.tag}</span>
+</button>
+`
+document.body.appendChild( n5 );
+
+
+var editor3 = new Editor(placeData);
+document.body.appendChild( editor3.pre );
+
+// Template call + element replacement
+var n0 = live`
+<div id="n0" class="main">
+	${Col3( placeData.name, placeData.address, placeData.telephone )}
+</div>`;
+document.body.appendChild( n0 );
+
+
+
+var editor4 = new Editor(theme);
+document.body.appendChild( editor4.pre );
+
+console.log('aze');
+
+with(theme)
+{
+	document.head.appendChild(live`
+		<style>
+			body{
+				background-color: #${color1};
+				color: #${color2};
+			}
+			h1 {
+				background-color: #${color3};
+				color: white;
+			}
+		</style>
+	`)
+}
+
+// theme.color1('FFFFFF');
+theme.color1 = '607D8B';
+
+
+
+var mouse = {
+	x: Bindable({value:0}),
+	y: Bindable({value:0})
+};
+window.addEventListener('mousemove', e=> (mouse.x(e.clientX+window.scrollX),mouse.y(e.clientY+window.scrollY)) )
+
+document.body.appendChild( live`
+    <img src="http://icons.iconarchive.com/icons/umut-pulat/tulliana-2/128/mouse-icon.png" 
+         style="position:absolute;margin: 10px -118px;top:${mouse.y}px;left:${mouse.x}px;"/>` 
+ )
+
+</script>
+		<script>
+		Array.from(document.querySelectorAll('samp,code,pre'))
+			.map( code=> {
+				let indent = code.innerHTML.match(/\s*/)[0].replace('\n','').split('\t').length-1
+				code.innerHTML = code.innerHTML
+									.replace(/^\n/m, '')
+									.replace(/[\n\t]*$/g, '')
+									.replace(new RegExp('\t{'+indent+'}','g'), '')
+									.replace(/</g, '&lt;')
+									.replace(/\/\/([\s\S]*?)$/gm, '<g>//$1</g>')
+									.replace(/\\`([\s\S]*?)\\`/g, '<g>\\`$1\\`</g>')
+									.replace(/(['"])([\s\S]*?)\1/g, '<g>$1$2$1</g>')
+									.replace(/\\\$\{(.*?)\}/g, '<r>\\${</r><b>$1</b><r>}</r>')
+			})
+		</script>
+	</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Tests - e4x</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="../src/micro.js"></script>
+		<script src="../src/stremplate.js"></script>
+		<script src="../src/e4x.js"></script>
+		<script src="../src/Mutants.js"></script>
+	</head>
+	<body>
+	    
+<script>"use strict";
+
+
+var NS = {
+    html: 'xmlns="http://www.w3.org/1999/xhtml"',
+    t3: 'xmlns:THREE="THREE.*"',
+	fb: 'xmlns:fb="http://www.facebook.com/"',
+    lang: 'xmlns:lang="languages"',
+    mx: 'xmlns:mx="mx.*"',
+    icon: 'xmlns:icon="/images/icons/*"',
+
+};
+
+var page = x`<div ${NS.html} class="container">
+    <div class="row">
+        <div class="col-xl-12"></div>
+    </div>
+</div>`;
+
+var personne = x`<personne ${NS.fb} ${NS.lang}>
+  <nom>Jean Dupont</nom>
+  <fb:aime>
+    <os>Linux</os>
+    <navigateur lang:fr_FR="Navigateur">Firefox</navigateur>
+    <langage>JavaScript</langage>
+    <langage>Python</langage>
+  </fb:aime>
+</personne>`;
+
+var languages = x`<languages type="dynamique">
+   <lang>JavaScript</lang>
+   <lang>Python</lang>
+ </languages>`;
+
+
+var gens = x`<gens xmlns:h="http://www.w3.org/1999/xhtml">
+  <personne h:contenteditable="true">
+    <string:nom>Pierre</string:nom>
+    <age>32</age>
+  </personne>
+  <personne>
+    <nom>Paul</nom>
+    <age>46</age>
+  </personne>
+</gens>`;
+
+var app = x`<mx:Application ${NS.mx} ${NS.icon}>
+  <mx:Header>
+    <mx:Button><icon:menu/></mx:Button>
+  </mx:Header>
+  <mx:PageView selected="{config.startPage}">
+    <mx:Page>Paul</mx:Page>
+    <mx:Page>46</mx:Page>
+  </mx:PageView>
+</mx:Application>`;
+
+var system = x`
+<system:Solar xmlns:star="lib3D.stars.*" 
+              xmlns:system="lib3D.systems.*" 
+              xmlns:planets="lib3D.planets.*"
+              xmlns:THREE="THREE.*"
+              id="system">
+    <star:Field id="system.stars"></star:Field>
+    <star:Sun id="system.sun"></star:Sun>
+    <planet:Earth id="system.earth" atmosphere="true" clouds="0.5">
+        <THREE:PerspectiveCamera id="system.earth.camera"></THREE:PerspectiveCamera>
+    </planet:Earth>
+    <planet:Moon></planet:Moon>
+</system:Solar>
+`;
+
+
+// console.log(languages.$type); // Affiche "dynamique"
+// languages.$type = "agile";
+// console.log(languages.$type); // Affiche "agile"
+console.log(languages.toString());
+/* Affiche :
+<languages type="agile"><lang>JavaScript</lang><lang>Python</lang></languages>
+*/
+
+
+console.log( personne.nom ); // "Jean Dupont"
+console.log( personne['nom'] ); // "Jean Dupont"
+console.log( personne.aime.navigateur ); // "Firefox"
+console.log( personne['aime'].navigateur ); // "Firefox"
+console.log( personne.aime.langage.length() ); // 2
+// console.log( personne.aime.$.length()); // 4
+// console.log( personne._.$.length()); // 11
+console.log( personne.nom.text() ); // "Jean Dupont"
+var xml = personne.toXMLString(); // Une chaîne contenant le XML
+// var copiePersonne = personne.copy(); // Une copie profonde de l'objet XML
+// var enfant = person.child(1); // Le second nœud enfant ; dans ce cas l'élément <aime>
+
+
+</script>
+	</body>
+</html>
