@@ -25,7 +25,7 @@ Outputs :
 ```xml
 <div>
 	<span class="greetings">Hello</span>
-	${who} !
+	<v-node>Doctor</v-node> !
 </div>
 ```
 
@@ -39,12 +39,18 @@ var myData = BindableProxy({
 	your: "plain",
 	data: "object"
 })
+
+// or 
+fetch( 'http://some.domain/some/data.json' )
+	.then( res=> res.json() )
+	.then( json=> BindableProxy(json) )
+
 ```
 
 This makes the properties of your object emitting changes event:
 
 ```javascript
-myData.your.on( e=> console.info('myData.your cahnged from %s to %s', e.old, e.new ) )
+myData.your.on( e=> console.info('myData.your changed from %s to %s', e.old, e.new ) )
 // then
 myData.your = 'world' // {type: "propertyChange", old: "plain", new: "world"}
 ```
@@ -55,8 +61,7 @@ You can create a standalone bindable property with <b>Property</b>:
 var title = Property({ value: "Hello world" })
 ```
 
-
-Once 
+Once used in string templates `live` destects the property can emit changeEvent so it can change the portion of text in the DOM directly (no virtual DOM bull****).
 
 
 ## With a person
@@ -91,18 +96,22 @@ document.body.appendChild( Person(personData) )
 
 ```
 <div class="Person container">
-	<img class="profile" src="${personData.profile}">
-	<h1>${personData.firstName} ${personData.lastName} (${personData.username})</h1>
-	<div class="info telephone">${personData.telephone}</div>
-	<div class="info address">${personData.address}</div>
-	<div class="info country">${personData.country}</div>
-	<div class="info email">${personData.email}</div>
+	<img class="profile" src="https://placekitten.com/g/128/170">
+	<h1><v-node>Jeanne</v-node> <v-node>Dupond</v-node> (<v-node>Jeanette</v-node>)</h1>
+	<div class="info telephone"><v-node>06 69 69 69 69</v-node></div>
+	<div class="info address"><v-node>42 av. Utopia</v-node></div>
+	<div class="info country"><v-node>France</v-node></div>
+	<div class="info email"><v-node>42@Utopia.coop</v-node></div>
 </div>
 ```
-${person = Person( personData )}
 
-
-${editor1 = new Editor(personData),editor1.pre}
+Template in template:
+```
+<section id="main">
+	${person = Person( personData )}
+	${editor1 = new Editor(personData),editor1.pre}
+</section>
+```
 
 
 ## With a place
