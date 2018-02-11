@@ -188,7 +188,7 @@ Bindable.isDescriptor = function( obj )
  * @param bindables:Array[Property|Object] 	The values array from es6 template string
  * @return Node            					The generated live node
  */
-window.live = function live( ss )
+const live = window.live = function live( ss )
 {
 	var bindables = Array.from(arguments).splice(1),
 	    // Just replace substitutions by a placehodler
