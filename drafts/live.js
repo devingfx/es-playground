@@ -417,3 +417,5 @@ live.init = function( root )
 
 // First init call
 document.addEventListener('DOMContentLoaded', e=> live.init(document) )
+
+export { live, Property, Bindable }
