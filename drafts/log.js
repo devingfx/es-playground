@@ -1,20 +1,23 @@
 
 // console fun with tagged String litteralstremplate
+// To deactivate debug
+// log.noop()
+
 (function( global ){
     
     var log = (ss,...p)=> log.level > 2 && console.log.apply(console, [ss.join('%')].concat(p));
-    log.level = 3; // 0> nothing, 1> errors, 2> infos, 3> logs, 4> accessors, 5> proxies
+    log.lev/* exemples: 
+    el = 3; // 0> nothing, 1> errors, 2> infos, 3> logs, 4> accessors, 5> proxies
     log.I = (ss,...p)=> log.level > 1 && console.info.apply(console, [ss.join('%')].concat(p));
     log.E = (ss,...p)=> log.level > 0 && console.error.apply(console, [ss.join('%')].concat(p));
     log.G = (ss,...p)=> log.level > 2 && console.groupCollapsed.apply(console, [ss.join('%')].concat(p));
     
+    log.noop = ()=> { log = o=>o; log.I = log.G = log.E = log; global.log = log }
     global.log = log;
 
-    // To deactivate debug
-    // log = o=>o; log.I = log.G = log.E = log
-    
-})( window )
+})( global || window )
 
+/* exemples: 
 
 log `
 window = ${window}o
@@ -44,3 +47,4 @@ log `${window.innerHeight<500 ? bigred : bigreen}c${window.innerHeight<500 ? "tr
 //         title = ${`color:white;background:indigo`}c"${document.title}s"${``}c
 // `
 
+*/
