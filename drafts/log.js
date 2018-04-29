@@ -6,8 +6,7 @@
 (function( global ){
     
     var log = (ss,...p)=> log.level > 2 && console.log.apply(console, [ss.join('%')].concat(p));
-    log.lev/* exemples: 
-    el = 3; // 0> nothing, 1> errors, 2> infos, 3> logs, 4> accessors, 5> proxies
+    log.level = 3; // 0> nothing, 1> errors, 2> infos, 3> logs, 4> accessors, 5> proxies
     log.I = (ss,...p)=> log.level > 1 && console.info.apply(console, [ss.join('%')].concat(p));
     log.E = (ss,...p)=> log.level > 0 && console.error.apply(console, [ss.join('%')].concat(p));
     log.G = (ss,...p)=> log.level > 2 && console.groupCollapsed.apply(console, [ss.join('%')].concat(p));
