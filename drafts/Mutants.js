@@ -1,7 +1,7 @@
 "use strict";
-Proxy.prototype = {}; // Bug: chrome Proxy do not have a prototye so you can't extend it without.
+// Proxy.prototype = {}; // Bug: chrome Proxy do not have a prototye so you can't extend it without.
 
-window.log = window.log || (function(){var l=o=>o; l.I=l.E=l.I=l.G=l;return l})()
+// window.log = window.log || (function(){var l=o=>o; l.I=l.E=l.I=l.G=l;return l})()
 
 function getCompiledFunction (key) {
   try {
@@ -16,7 +16,20 @@ function getCompiledFunction (key) {
 //   return void 0;
 // }
 
-
+class Mutant extends Array {
+    constructor()
+    {
+	super()
+        return new Proxy( this, this )
+    }
+    on(et){}
+    off(ice){}
+    fire(feu){}
+    get(o,p){ return Reflect.get(o,p) }
+    set(o,p,v){ return Reflect.set(o,p,v) }
+}
+// test heritance 
+// class Toto extends Mutant {}
 
 class Mutant extends Proxy {
 	constructor( value )
